@@ -18,26 +18,26 @@ fn indent(size: usize) -> String {
 
 fn getBankSchema() -> Vec::<DatabaseEntry> {
     let mut ret = Vec::<DatabaseEntry>::new();
-    ret.push(DatabaseEntry{row_name = "uuid", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "name", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "version", row_type = "INTEGER"});
+    ret.push(DatabaseEntry{ row_name: "uuid".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{ row_name: "name".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{ row_name: "version".to_string(), row_type: "INTEGER".to_string()});
     return ret;
 }
 
 fn getPresetSchema() -> Vec::<DatabaseEntry> {
     let mut ret = Vec::<DatabaseEntry>::new();
-    ret.push(DatabaseEntry{row_name = "uuid", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "bank-uuid", row_type = "TEXT"});
+    ret.push(DatabaseEntry{row_name: "uuid".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{row_name: "bankuuid".to_string(), row_type: "TEXT".to_string()});
     return ret;
 }
 
 fn getParameterSchema() -> Vec::<DatabaseEntry> {
     let mut ret = Vec::<DatabaseEntry>::new();
-    ret.push(DatabaseEntry{row_name = "id", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "preset-uuid", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "value", row_type = "FLOAT"});
-    ret.push(DatabaseEntry{row_name = "mc", row_type = "TEXT"});
-    ret.push(DatabaseEntry{row_name = "mod-amt", row_type = "FLOAT"});
+    ret.push(DatabaseEntry{row_name: "id".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{row_name: "presetuuid".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{row_name: "value".to_string(), row_type: "FLOAT".to_string()});
+    ret.push(DatabaseEntry{row_name: "mc".to_string(), row_type: "TEXT".to_string()});
+    ret.push(DatabaseEntry{row_name: "modamt".to_string(), row_type: "FLOAT".to_string()});
     return ret;
 } 
 
@@ -49,12 +49,12 @@ struct Bank {
 
 struct Preset {
     uuid: String,
-    bank-uuid: String
+    bank_uuid: String
 }
 
 struct Parameter {
     id: String,
-    preset-uuid: String,
+    preset_uuid: String,
     value: f32,
     mc: String, 
     mod_amt: f32
@@ -76,7 +76,7 @@ fn createTable(dbConnection: &sqlite::Connection, tableName: String, schema: Vec
     }
     schemaString.push_str(")");
 
-    println!("{}", schemaString);
+    println!("schema for {}: {}", tableName, schemaString);
     
     let createCmd = format!("CREATE TABLE {} {};", tableName, schemaString);
 
@@ -90,6 +90,7 @@ fn insertIntoTable(dbConnection: &sqlite::Connection, tableName: String, name: S
     dbConnection.execute(
         insertCmd,
     ).unwrap();
+    println!("insert for {}: {} ({})", tableName, name, age);
 }
 
 // This is the main function
@@ -100,7 +101,9 @@ fn main() {
     println!("welcome to the NonlinearLabs Bank SQL interface");
     let connection = sqlite::open(":memory:").unwrap();
 
-    let mut bank
+    createTable(&connection, "banks".to_string(), getBankSchema());
+    createTable(&connection, "presets".to_string(), getPresetSchema());
+    createTable(&connection, "parameters".to_string(), getParameterSchema());
 
     let mut schema = Vec::<DatabaseEntry>::new();
     schema.push(DatabaseEntry{row_name: "name".to_string(), row_type: "TEXT".to_string()});
