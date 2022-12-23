@@ -41,6 +41,11 @@ fn getParameterSchema() -> Vec::<DatabaseEntry> {
     return ret;
 } 
 
+struct Attribute {
+    name: String,
+    value: String
+}
+
 struct Bank {
     uuid: String,
     name: String,
@@ -120,6 +125,67 @@ fn main() {
             true
         })
         .unwrap();
+
+
+    let file = File::open("Kontour_01_Keys_ssc.xml").unwrap();
+    let file = BufReader::new(file);
+
+    let parser = EventReader::new(file);
+    let mut depth = 0;
+
+    // let mut currentBank = Bank{};
+    // let mut currentPreset = Preset{};
+    // let mut currentParameter = Parameter{};
+
+    let mut currentTag = String::new();
+
+    for e in parser {
+        match e {
+            Ok(XmlEvent::StartElement { name, attributes, .. }) => {
+                if (name.to_string() == "value".to_string()) {
+                    return;
+                }
+                println!("{}+{}", indent(depth), name);
+                for ownedAttribute in attributes.iter() {
+                    println!("{}+{}: {}", indent(depth), name, ownedAttribute);
+                }
+                depth += 1;
+                currentTag = name.to_string();
+            }
+            Ok(XmlEvent::Characters(text)) => {
+                
+
+                match &currentTag as &str {
+                    "modSrc" => {
+                        
+                    },
+                    "modAmount" => {
+                        
+                    },
+                    "value" => {
+
+                    },
+                    {
+                        println!("{} {}", indent(depth), text)
+                    }
+                }
+            }
+            Ok(XmlEvent::CData(text)) => {
+                println!("{} {}", indent(depth), text);
+
+                
+            }
+            Ok(XmlEvent::EndElement { name }) => {
+                depth -= 1;
+                println!("{}-{}", indent(depth), name);
+            }
+            Err(e) => {
+                println!("Error: {}", e);
+                break;
+            }
+            _ => {}
+        }
+    }
 }
 
 
